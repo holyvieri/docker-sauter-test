@@ -1,27 +1,31 @@
-# Stage 1: Build
-FROM python:3.9-slim as builder
+# Estágio 1: Builder
+FROM python:3.9-slim AS builder
 
+# Define o diretório de trabalho
 WORKDIR /app
 
-# Instalar dependências
+# Copia o arquivo requirements.txt para instalar as dependências
 COPY requirements.txt .
-RUN pip install --user -r requirements.txt
 
-# Copiar o código da aplicação
-COPY app.py .
+# Instala as dependências necessárias
+RUN pip install --upgrade pip && \
+    pip install --user -r requirements.txt
 
-# Stage 2: Final
+# Copia o código da aplicação
+COPY . .
+
+# Estágio 2: Imagem Final
 FROM python:3.9-slim
 
+# Define o diretório de trabalho
 WORKDIR /app
 
-# Copiar dependências e código da Stage 1
-COPY --from=builder /root/.local /root/.local
+# Copia apenas os arquivos necessários do estágio builder
 COPY --from=builder /app /app
+COPY --from=builder /root/.local /root/.local
 
-# Definir variáveis de ambiente
-ENV PATH=/root/.local/bin:$PATH
-
-# Expor a porta e rodar o app
+# Expor a porta que o Flask vai rodar
 EXPOSE 8080
+
+# Comando para rodar o app
 CMD ["python", "app.py"]

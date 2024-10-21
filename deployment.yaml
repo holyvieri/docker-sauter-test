@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docker-test-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: docker-test-app
+  template:
+    metadata:
+      labels:
+        app: docker-test-app
+    spec:
+      containers:
+      - name: docker-test-app
+        image: anaoliveirac/docker-test-app:latest
+        ports:
+        - containerPort: 8080
